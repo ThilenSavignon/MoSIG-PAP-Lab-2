@@ -47,8 +47,8 @@ void parallel_bubble_sort (uint64_t *T, const uint64_t size)
         }
 
         // Swaps borders
-        #pragma omp parallel for
         uint64_t tmp;
+        #pragma omp parallel for
         for(int c = 0; c < chunk_num-1; c++) {
             if(T[(c+1) * chunk_size -1] > T[(c+1) * chunk_size]) {
                 tmp = T[(c+1) * chunk_size -1];
