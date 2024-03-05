@@ -12,9 +12,19 @@
 
 void sequential_bubble_sort (uint64_t *T, const uint64_t size)
 {
-    /* TODO: sequential implementation of bubble sort */
-    
-    return ;
+    /* DONE: sequential implementation of bubble sort */
+    int sorted;
+    do {
+	sorted = 1;
+	for (int i = 0; i < size - 1; i++) {
+	    if (T[i] > T[i + 1]) {
+		int tmp = T[i];
+		T[i] = T[i + 1];
+		T[i + 1] = tmp;
+		sorted = 0;
+	    }
+	}
+    } while (sorted == 0);
 }
 
 void parallel_bubble_sort (uint64_t *T, const uint64_t size)
