@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -fopenmp
+CFLAGS = -O2 -fopenmp -g -Wall
 LDFLAGS = -fopenmp
 
 EXEC = 	bubble.run	\
