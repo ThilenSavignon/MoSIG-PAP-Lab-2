@@ -18,7 +18,7 @@ void sequential_bubble_sort (uint64_t *T, const uint64_t size)
 	sorted = 1;
 	for (int i = 0; i < size - 1; i++) {
 	    if (T[i] > T[i + 1]) {
-		    int tmp = T[i];
+		    uint64_t tmp = T[i];
 		    T[i] = T[i + 1];
 		    T[i + 1] = tmp;
 		    sorted = 0;
@@ -30,7 +30,7 @@ void sequential_bubble_sort (uint64_t *T, const uint64_t size)
 void single_bubble_sort(uint64_t *T, const uint64_t size) {
     for (int i = 0; i < size - 1; i++) {
 	    if (T[i] > T[i + 1]) {
-		    int tmp = T[i];
+		    uint64_t tmp = T[i];
 		    T[i] = T[i + 1];
 		    T[i + 1] = tmp;
 	    }

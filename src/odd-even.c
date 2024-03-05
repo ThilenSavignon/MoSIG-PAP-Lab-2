@@ -45,7 +45,30 @@ void parallel_oddeven_sort (uint64_t *T, const uint64_t size)
 {
 
     /* TODO: parallel implementation of odd-even sort */ 
-
+    uint64_t swaped;
+    do {
+        swaped = 0;
+        #pragma omp parallel for reduction(+:swaped)
+        for(int i=0; i < size-1; i+=2) {
+            uint64_t tmp;
+            if(T[i] > T[i+1]) {
+                tmp = T[i];
+                T[i] = T[i+1];
+                T[i+1] = tmp;                
+                swaped += 1;
+            }
+        }
+        #pragma omp parallel for reduction(+:swaped)
+        for(int i=1; i < size-2; i+=2) {
+            uint64_t tmp;
+            if(T[i] > T[i+1]) {
+                tmp = T[i];
+                T[i] = T[i+1];
+                T[i+1] = tmp;                
+                swaped += 1;
+            }
+        }
+    } while(swaped);
     return ;
 }
 
