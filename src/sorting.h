@@ -9,6 +9,7 @@ extern struct cpu_stats_report experiments[NB_EXPERIMENTS];
 
 /* utility functions */
 void init_array_sequence(uint64_t *T, uint64_t size);
+void init_array_sorted(uint64_t *T, uint64_t size);
 void init_array_random(uint64_t *T, uint64_t size);
 void print_array(uint64_t *T, uint64_t size);
 int is_sorted_sequence(uint64_t *T, uint64_t size);

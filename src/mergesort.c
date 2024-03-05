@@ -66,9 +66,12 @@ void merge (uint64_t *T, const uint64_t size)
 
 void sequential_merge_sort (uint64_t *T, const uint64_t size)
 {
-    /* TODO: sequential implementation of merge sort */ 
-    
-    return ;
+    /* DONE: sequential implementation of merge sort */ 
+    if (size < 2)
+	return;
+    sequential_merge_sort(T, size / 2);
+    sequential_merge_sort(T + size / 2, size / 2);
+    merge(T, size / 2);
 }
 
 void parallel_merge_sort (uint64_t *T, const uint64_t size)
@@ -101,12 +104,16 @@ int main (int argc, char **argv)
     printf("--> Sorting an array of size %lu\n",N);
 #ifdef RINIT
     printf("--> The array is initialized randomly\n");
+#elif defined(SINIT)
+    printf("--> The array is initialized already sorted\n");
 #endif
     
 
     for (exp = 0 ; exp < NB_EXPERIMENTS; exp++){
 #ifdef RINIT
         init_array_random (X, N);
+#elif defined(SINIT)
+	init_array_sorted(X, N);
 #else
         init_array_sequence (X, N);
 #endif
@@ -142,6 +149,8 @@ int main (int argc, char **argv)
     {
 #ifdef RINIT
         init_array_random (X, N);
+#elif defined(SINIT)
+	init_array_sorted(X, N);
 #else
         init_array_sequence (X, N);
 #endif
@@ -182,6 +191,8 @@ int main (int argc, char **argv)
 
 #ifdef RINIT
     init_array_random (Y, N);
+#elif defined(SINIT)
+    init_array_sorted(X, N);
 #else
     init_array_sequence (Y, N);
 #endif
