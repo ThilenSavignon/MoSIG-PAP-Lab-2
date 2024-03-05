@@ -17,6 +17,16 @@ void init_array_sequence (uint64_t *T, uint64_t size)
     }
 }
 
+void init_array_sorted (uint64_t *T, uint64_t size)
+{
+    uint64_t i;
+
+    for (i = 0 ; i < size ; i++)
+    {
+        T [i] = i ;
+    }
+}
+
 void init_array_random (uint64_t *T, uint64_t size)
 {
     uint64_t i;

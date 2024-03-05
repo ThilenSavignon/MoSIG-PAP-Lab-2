@@ -9,10 +9,16 @@ EXEC = 	bubble.run	\
 HEADER_FILES = $(wildcard *.h)
 
 RAND_INIT=0
+SORTED_INIT=0
 
 ifeq ($(RAND_INIT), 1)
 $(Initialization of the vector with random values)
 CONFIG_FLAGS += -DRINIT
+endif
+
+ifeq ($(SORTED_INIT), 1)
+$(Initialization of the vector with already sorted values)
+CONFIG_FLAGS += -DSINIT
 endif
 
 all: $(EXEC)

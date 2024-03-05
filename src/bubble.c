@@ -68,11 +68,16 @@ int main (int argc, char **argv)
 #ifdef RINIT
     printf("--> The array is initialized randomly\n");
 #endif
+#ifdef SINIT
+    printf("--> The array is initialized already sorted\n");
+#endif    
     
 
     for (exp = 0 ; exp < NB_EXPERIMENTS; exp++){
 #ifdef RINIT
         init_array_random (X, N);
+#elif defined(SINIT)
+	init_array_sorted(X, N);
 #else
         init_array_sequence (X, N);
 #endif
@@ -107,6 +112,8 @@ int main (int argc, char **argv)
     {
 #ifdef RINIT
         init_array_random (X, N);
+#elif defined(SINIT)
+	init_array_sorted(X, N);
 #else
         init_array_sequence (X, N);
 #endif
@@ -147,6 +154,8 @@ int main (int argc, char **argv)
 
 #ifdef RINIT
     init_array_random (Y, N);
+#elif defined(SINIT)
+    init_array_sorted(X, N);
 #else
     init_array_sequence (Y, N);
 #endif
