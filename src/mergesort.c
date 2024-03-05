@@ -76,9 +76,16 @@ void sequential_merge_sort (uint64_t *T, const uint64_t size)
 
 void parallel_merge_sort (uint64_t *T, const uint64_t size)
 {
-    /* TODO: parallel implementation of merge sort */
-
-    return;
+    /* DONE: parallel implementation of merge sort */
+    if (size < 2)
+        return;
+    const uint64_t mid = size / 2;
+    #pragma omp task firstprivate(T, mid)
+    parallel_merge_sort(T, mid);
+    #pragma omp task firstprivate(T, mid)
+    parallel_merge_sort(&T[mid], mid);
+    #pragma omp taskwait
+    merge(T, mid);
 }
 
 
@@ -156,7 +163,9 @@ int main (int argc, char **argv)
 #endif
 
         cpu_stats_begin(stats);
-        
+
+        #pragma omp parallel
+        #pragma omp single
         parallel_merge_sort (X, N) ;
 
         experiments[exp] = cpu_stats_end(stats);      
