@@ -18,13 +18,23 @@ void sequential_bubble_sort (uint64_t *T, const uint64_t size)
 	sorted = 1;
 	for (int i = 0; i < size - 1; i++) {
 	    if (T[i] > T[i + 1]) {
-		int tmp = T[i];
-		T[i] = T[i + 1];
-		T[i + 1] = tmp;
-		sorted = 0;
+		    int tmp = T[i];
+		    T[i] = T[i + 1];
+		    T[i + 1] = tmp;
+		    sorted = 0;
 	    }
 	}
     } while (sorted == 0);
+}
+
+void single_bubble_sort(uint64_t *T, const uint64_t size) {
+    for (int i = 0; i < size - 1; i++) {
+	    if (T[i] > T[i + 1]) {
+		    int tmp = T[i];
+		    T[i] = T[i + 1];
+		    T[i + 1] = tmp;
+	    }
+	}
 }
 
 void parallel_bubble_sort (uint64_t *T, const uint64_t size)
@@ -33,22 +43,23 @@ void parallel_bubble_sort (uint64_t *T, const uint64_t size)
     uint32_t max_thread_num = omp_get_max_threads();
     uint32_t chunk_num = max_thread_num > size ? size : max_thread_num;
     uint32_t chunk_size = size / chunk_num;
+    uint32_t last_chunk_size = chunk_size + (size % chunk_num);
 
     while(!is_sorted(T, size)) {
 
         // Execute chunked bubble sort
         #pragma omp parallel for
         for(int c = 0; c < chunk_num; c++) {
-            // Sequential bubble sort execution on chunk index c
+            // Single sequential bubble sort execution on chunk index c
             // Chunk starts at T + c * chunk_size
             // Every chunk but the last one have a size of chunk_size
-            // The last chunk has a size of size % chunk_num
-            sequential_bubble_sort(T+(c*chunk_size), (c==chunk_size-1 ? size % chunk_num : chunk_size));
+            // The last chunk has a size of chunk_size + size % chunk_num
+            single_bubble_sort(T+(c*chunk_size), (c==chunk_num-1 ? last_chunk_size : chunk_size));
         }
 
         // Swaps borders
         uint64_t tmp;
-        #pragma omp parallel for
+        // #pragma omp parallel for
         for(int c = 0; c < chunk_num-1; c++) {
             if(T[(c+1) * chunk_size -1] > T[(c+1) * chunk_size]) {
                 tmp = T[(c+1) * chunk_size -1];
