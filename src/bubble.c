@@ -20,7 +20,33 @@ void sequential_bubble_sort (uint64_t *T, const uint64_t size)
 void parallel_bubble_sort (uint64_t *T, const uint64_t size)
 {
     /* TODO: parallel implementation of bubble sort */
-    
+    uint32_t max_thread_num = omp_get_max_threads();
+    uint32_t chunk_num = max_thread_num > size ? size : max_thread_num;
+    uint32_t chunk_size = size / chunk_num;
+
+    while(!is_sorted(T, size)) {
+
+        // Execute chunked bubble sort
+        #pragma omp parallel for
+        for(int c = 0; c < chunk_num; c++) {
+            // Sequential bubble sort execution on chunk index c
+            // Chunk starts at T + c * chunk_size
+            // Every chunk but the last one have a size of chunk_size
+            // The last chunk has a size of size % chunk_num
+            sequential_bubble_sort(T+(c*chunk_size), (c==chunk_size-1 ? size % chunk_num : chunk_size));
+        }
+
+        // Swaps borders
+        #pragma omp parallel for
+        uint64_t tmp;
+        for(int c = 0; c < chunk_num-1; c++) {
+            if(T[(c+1) * chunk_size -1] > T[(c+1) * chunk_size]) {
+                tmp = T[(c+1) * chunk_size -1];
+                T[(c+1) * chunk_size -1] = T[(c+1) * chunk_size];
+                T[(c+1) * chunk_size] = tmp;
+            }
+        }
+    }
     return;
 }
 
