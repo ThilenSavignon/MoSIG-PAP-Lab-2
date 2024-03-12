@@ -7,55 +7,61 @@
 #include "sorting.h"
 
 
-/* 
+/*
    Merge two sorted chunks of array T!
    The two chunks are of size size
    First chunck starts at T[0], second chunck starts at T[size]
 */
-void merge (uint64_t *T, const uint64_t size)
+void merge(uint64_t *T, const uint64_t size)
 {
-  uint64_t *X = (uint64_t *) malloc (2 * size * sizeof(uint64_t)) ;
-  
-  uint64_t i = 0 ;
-  uint64_t j = size ;
-  uint64_t k = 0 ;
-  
-  while ((i < size) && (j < 2*size))
-    {
-      if (T[i] < T [j])
-	{
-	  X [k] = T [i] ;
-	  i = i + 1 ;
-	}
-      else
-	{
-	  X [k] = T [j] ;
-	  j = j + 1 ;
-	}
-      k = k + 1 ;
+    uint64_t *buff = (uint64_t *) malloc(2 * size * sizeof(uint64_t));
+
+    uint64_t i = 0;
+    uint64_t j = size;
+    uint64_t k = 0;
+
+    while (i < size && j < 2 * size) {
+        if (T[i] < T[j])
+            buff[k] = T[i++];
+        else
+            buff[k] = T[j++];
+        k++;
     }
 
-  if (i < size)
-    {
-      for (; i < size; i++, k++)
-	{
-	  X [k] = T [i] ;
-	}
-    }
-  else
-    {
-      for (; j < 2*size; j++, k++)
-	{
-	  X [k] = T [j] ;
-	}
-    }
-  
-  memcpy (T, X, 2*size*sizeof(uint64_t)) ;
-  free (X) ;
-  
-  return ;
+    for (; i < size; i++, k++)
+        buff[k] = T[i];
+    for (; j < 2 * size; j++, k++)
+        buff[k] = T[j];
+    
+    memcpy(T, buff, 2 * size * sizeof(uint64_t));
+
+    free(buff);
+    return;
 }
 
+void merge2(uint64_t *T, uint64_t *buff, const uint64_t size)
+{
+    memcpy(buff, T, 2 * size * sizeof(uint64_t));
+
+    uint64_t i = 0;
+    uint64_t j = size;
+    uint64_t k = 0;
+
+    while (i < size && j < 2 * size) {
+        if (buff[i] < buff[j])
+            T[k] = buff[i++];
+        else
+            T[k] = buff[j++];
+        k++;
+    }
+
+    for (; i < size; i++, k++)
+        T[k] = buff[i];
+    for (; j < 2 * size; j++, k++)
+        T[k] = buff[j];
+
+    return;
+}
 
 
 
@@ -74,18 +80,35 @@ void sequential_merge_sort (uint64_t *T, const uint64_t size)
     merge(T, size / 2);
 }
 
-void parallel_merge_sort (uint64_t *T, const uint64_t size)
+void parallel_merge_sort_rec(uint64_t *T, uint64_t *buff, const uint64_t size)
 {
     /* DONE: parallel implementation of merge sort */
     if (size < 2)
         return;
+
     const uint64_t mid = size / 2;
-    #pragma omp task firstprivate(T, mid)
-    parallel_merge_sort(T, mid);
-    #pragma omp task firstprivate(T, mid)
-    parallel_merge_sort(&T[mid], mid);
+
+    // The best value so far, after multiple tests
+    #define TS 1024
+
+    #pragma omp task firstprivate(T) if (size >= TS)
+    parallel_merge_sort_rec(T, buff, mid);
+    #pragma omp task firstprivate(T) if (size >= TS)
+    parallel_merge_sort_rec(T + mid, buff + mid, mid);
+    
     #pragma omp taskwait
-    merge(T, mid);
+    merge2(T, buff, mid);
+}
+
+void parallel_merge_sort(uint64_t *T, const uint64_t size)
+{
+    uint64_t *buff = (uint64_t *) malloc(size * sizeof(uint64_t));
+    
+    #pragma omp parallel
+    #pragma omp single
+    parallel_merge_sort_rec(T, buff, size);
+    
+    free(buff);
 }
 
 
@@ -164,8 +187,6 @@ int main (int argc, char **argv)
 
         cpu_stats_begin(stats);
 
-        #pragma omp parallel
-        #pragma omp single
         parallel_merge_sort (X, N) ;
 
         experiments[exp] = cpu_stats_end(stats);      
@@ -209,7 +230,7 @@ int main (int argc, char **argv)
     memcpy(Z, Y, N * sizeof(uint64_t));
 
     sequential_merge_sort (Y, N) ;
-    parallel_merge_sort (Z, N) ;
+    parallel_merge_sort (Z, N);
 
     if (! are_vector_equals (Y, Z, N)) {
         fprintf(stderr, "ERROR: sorting with the sequential and the parallel algorithm does not give the same result\n") ;
@@ -220,5 +241,4 @@ int main (int argc, char **argv)
     free(X);
     free(Y);
     free(Z);
-    
 }

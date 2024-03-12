@@ -11,6 +11,9 @@ HEADER_FILES = $(wildcard *.h)
 RAND_INIT=0
 SORTED_INIT=0
 
+TS=1024
+export TS
+
 ifeq ($(RAND_INIT), 1)
 $(Initialization of the vector with random values)
 CONFIG_FLAGS += -DRINIT
