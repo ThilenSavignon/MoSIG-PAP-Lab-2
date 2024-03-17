@@ -118,14 +118,17 @@ int main (int argc, char **argv)
     struct cpu_stats *stats = cpu_stats_init();
 
     unsigned int exp ;
+    int parallel_flag = 0;
 
     /* the program takes one parameter N which is the size of the array to
        be sorted. The array will have size 2^N */
-    if (argc != 2)
+    if (argc != 2 && argc != 3)
     {
         fprintf (stderr, "Usage: merge.run N \n") ;
         exit (-1) ;
     }
+    if (argc == 3)
+        parallel_flag = 1;
 
     uint64_t N = 1 << (atoi(argv[1])) ;
     /* the array to be sorted */
@@ -147,23 +150,25 @@ int main (int argc, char **argv)
 #else
         init_array_sequence (X, N);
 #endif
-        
+
+        if (!parallel_flag)
+{        
         cpu_stats_begin(stats);      
         
         sequential_merge_sort (X, N) ;
 
         experiments[exp] = cpu_stats_end(stats);
-        
+}       
         /* verifying that X is properly sorted */
 #ifdef RINIT
-        if (! is_sorted (X, N))
+        if (! is_sorted (X, N) && !parallel_flag)
         {
             print_array (X, N) ;
             fprintf(stderr, "ERROR: the sequential sorting of the array failed\n") ;
             exit (-1) ;
 	}
 #else
-        if (! is_sorted_sequence (X, N))
+        if (! is_sorted_sequence (X, N) && !parallel_flag)
         {
             print_array (X, N) ;
             fprintf(stderr, "ERROR: the sequential sorting of the array failed\n") ;
