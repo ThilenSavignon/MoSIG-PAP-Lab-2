@@ -7,6 +7,9 @@
 #include "sorting.h"
 
 
+// Best value so far after testing a bunch of different ones
+uint64_t TS = 1024;
+
 /*
    Merge two sorted chunks of array T!
    The two chunks are of size size
@@ -59,7 +62,6 @@ void merge2(uint64_t *T, uint64_t *buff, const uint64_t size)
         T[k] = buff[i];
     for (; j < 2 * size; j++, k++)
         T[k] = buff[j];
-
     return;
 }
 
@@ -87,9 +89,6 @@ void parallel_merge_sort_rec(uint64_t *T, uint64_t *buff, const uint64_t size)
         return;
 
     const uint64_t mid = size / 2;
-
-    // The best value so far, after multiple tests
-    #define TS 1024
 
     #pragma omp task firstprivate(T) if (size >= TS)
     parallel_merge_sort_rec(T, buff, mid);
@@ -127,9 +126,10 @@ int main (int argc, char **argv)
         fprintf (stderr, "Usage: merge.run N \n") ;
         exit (-1) ;
     }
-    if (argc == 3)
+    if (argc == 3) {
+        TS = atoi(argv[2]);
         parallel_flag = 1;
-
+    }
     uint64_t N = 1 << (atoi(argv[1])) ;
     /* the array to be sorted */
     uint64_t *X = (uint64_t *) malloc (N * sizeof(uint64_t)) ;
